@@ -12,6 +12,7 @@ MeruAPI Is an API dedicated for online streaming, manga, torrenting and light no
 | Animetosho               | Torrents |
 | Anirena               | Torrents |
 | Nyaa               | Torrents |
+| Seadex               | Torrents |
 
 # Coming Soon
 | Provider                   | Type  |                                                               
