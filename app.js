@@ -5,6 +5,7 @@ const path = require('path');
 const { scrapeAnimeTosho } = require('./scrapers/torrents/animetosho');
 const { scrapeNyaa } = require('./scrapers/torrents/nyaa');
 const { scrapeAniRena } = require('./scrapers/torrents/anirena');
+const { scrapeSeadex } = require('./scrapers/torrents/seadex');
 
 // Manga Servers
 const { searchMangaFreak, getMangaFreakChapters, getMangaFreakPages } = require('./scrapers/manga/mangafreak');
@@ -205,6 +206,27 @@ app.get('/api/torrent/anirena', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch torrents', details: err.message });
   }
 });
+
+app.get('/api/torrent/seadex', async (req, res) => {
+  const query = req.query.query;
+  if (!query) {
+    return res.status(400).json({ error: 'Query parameter is required' });
+  }
+
+  try {
+    const torrents = await scrapeSeadex(query);
+    if (!torrents.length) {
+      return res.status(404).json({ error: 'No torrents found for the query' });
+    }
+    const bestTorrent = torrents[0];
+    res.json({ success: true, torrent: bestTorrent });
+  } catch (error) {
+    console.error(`API error: ${error.message}`);
+    res.status(500).json({ error: 'Failed to scrape torrents', details: error.message });
+  }
+});
+
+
 
 
 // ================================
