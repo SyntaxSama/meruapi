@@ -38,6 +38,19 @@ MeruAPI Is an API dedicated for online streaming, manga, torrenting and light no
 | Anirena               | Torrents | http://localhost:3000/api/torrent/anirena?query=solo%20leveling |
 | Nyaa               | Torrents | http://localhost:3000/api/torrent/nyaa?query=solo%20leveling |
 
+# How To Install The API
+To install the API run:
+```yaml
+git clone https://github.com/SyntaxSama/meruapi.git
+```
+To install the dependencies to use the api:
+```yaml
+npm install
+```
+To run the API:
+```yaml
+node app.js 
+```
 
 # Legal Disclaimer
 This is simply an API that hooks into other hosts and grabs information from. I the developer do not hold accountability/liability for how this API is used. 
