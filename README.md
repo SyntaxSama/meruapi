@@ -1,5 +1,5 @@
 # About MeruAPI
-MeruAPI Is an API dedicated for online streaming, manga, torrent streaming and light novels! we support a decent chunk of providers.
+MeruAPI Is an API dedicated for online streaming, manga, torrenting and light novels! we support a decent chunk of providers.
 
 *NOTICE! Light Novels will be coming at a later date*
 
