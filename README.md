@@ -37,6 +37,7 @@ MeruAPI Is an API dedicated for online streaming, manga, torrenting and light no
 | Animetosho               | Torrents | http://localhost:3000/api/torrent/animetosho?query=solo%20leveling |
 | Anirena               | Torrents | http://localhost:3000/api/torrent/anirena?query=solo%20leveling |
 | Nyaa               | Torrents | http://localhost:3000/api/torrent/nyaa?query=solo%20leveling |
+| Seadex               | Torrents | http://localhost:3000/api/torrent/seadex?query=Alya%20Sometimes%20Hides%20Her%20Feelings%20in%20Russian |
 
 # How To Install The API
 To install the API run:
