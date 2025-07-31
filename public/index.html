@@ -56,7 +56,7 @@
 
     <div id="loading" class="flex justify-center items-center mb-8">
       <div class="spinner"></div>
-      <span class="ml-3 text-gray-300">Checking API status...</span>
+      <span class="ml-3 text-gray-300">Checking API states... this can take a minute...</span>
     </div>
 
     <section id="status-tables" class="space-y-6 hidden">
@@ -72,7 +72,6 @@
                 <th class="py-3 px-4 sm:px-6 text-left">Service</th>
                 <th class="py-3 px-4 sm:px-6 text-left">Endpoint</th>
                 <th class="py-3 px-4 sm:px-6 text-left">Status</th>
-                <th class="py-3 px-4 sm:px-6 text-left">Uptime</th>
               </tr>
             </thead>
             <tbody id="streaming-status" class="text-gray-200 text-sm font-light"></tbody>
@@ -92,7 +91,6 @@
                 <th class="py-3 px-4 sm:px-6 text-left">Service</th>
                 <th class="py-3 px-4 sm:px-6 text-left">Endpoint</th>
                 <th class="py-3 px-4 sm:px-6 text-left">Status</th>
-                <th class="py-3 px-4 sm:px-6 text-left">Uptime</th>
               </tr>
             </thead>
             <tbody id="manga-status" class="text-gray-200 text-sm font-light"></tbody>
@@ -112,7 +110,6 @@
                 <th class="py-3 px-4 sm:px-6 text-left">Service</th>
                 <th class="py-3 px-4 sm:px-6 text-left">Endpoint</th>
                 <th class="py-3 px-4 sm:px-6 text-left">Status</th>
-                <th class="py-3 px-4 sm:px-6 text-left">Uptime</th>
               </tr>
             </thead>
             <tbody id="torrent-status" class="text-gray-200 text-sm font-light"></tbody>
@@ -143,7 +140,10 @@
       manga: [
         { service: 'MangaFreak', name: 'Search', url: 'http://localhost:3000/api/manga/mangafreak?q=one piece' },
         { service: 'MangaFreak', name: 'Chapters', url: 'http://localhost:3000/api/manga/mangafreak/chapters?url=https://mangafreak.net/Manga/One_Piece' },
-        { service: 'MangaFreak', name: 'Pages', url: 'http://localhost:3000/api/manga/mangafreak/pages?url=https://mangafreak.net/Read1_One_Piece_1' }
+        { service: 'MangaFreak', name: 'Pages', url: 'http://localhost:3000/api/manga/mangafreak/pages?url=https://mangafreak.net/Read1_One_Piece_1' },
+        { service: 'ComicK', name: 'Search', url: 'http://localhost:3000/api/manga/comick/search?q=frieren'},
+        { service: 'ComicK', name: 'Chapters', url: 'http://localhost:3000/api/manga/comick/chapters?hid=0FiLFYD1&page=10'},
+        { service: 'ComicK', name: 'Pages', url: 'http://localhost:3000/api/manga/comick/pages?hid=ClqZrOJS'}
       ],
       torrents: [
         { service: 'AnimeTosho', name: 'Search', url: 'http://localhost:3000/api/torrent/animetosho?query=one piece' },
@@ -158,12 +158,12 @@
         const response = await fetch(endpoint.url);
         const data = await response.json();
         if (response.ok && (Array.isArray(data) ? data.length > 0 : data.result ? data.result.length > 0 : Object.keys(data).length > 0)) {
-          return { status: 'OK', class: 'status-ok', uptime: '100%' };
+          return { class: 'status-ok', status: 'Online' };
         } else {
-          return { status: 'Something went wrong when trying to ping this route', class: 'status-error', uptime: '0%' };
+          return { class: 'status-error', status: 'Offline' };
         }
       } catch (err) {
-        return { status: 'Something went wrong when trying to ping this route', class: 'status-error', uptime: '0%' };
+        return { class: 'status-error', status: 'Offline' };
       }
     }
 
@@ -191,10 +191,9 @@
         <tr class="border-b border-gray-700 hover:bg-gray-600 transition fade-in">
           <td class="py-3 px-4 sm:px-6">${endpoint.service}</td>
           <td class="py-3 px-4 sm:px-6">${endpoint.name}</td>
-          <td class="py-3 px-4 sm:px-6 ${streamingResults[i].class}">${streamingResults[i].status}</td>
           <td class="py-3 px-4 sm:px-6">
-            <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full ${streamingResults[i].uptime === '100%' ? 'bg-green-500' : 'bg-red-500'} text-white">
-              ${streamingResults[i].uptime}
+            <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full ${streamingResults[i].status === 'Online' ? 'bg-green-500' : 'bg-red-500'} text-white">
+              ${streamingResults[i].status}
             </span>
           </td>
         </tr>
@@ -204,10 +203,9 @@
         <tr class="border-b border-gray-700 hover:bg-gray-600 transition fade-in">
           <td class="py-3 px-4 sm:px-6">${endpoint.service}</td>
           <td class="py-3 px-4 sm:px-6">${endpoint.name}</td>
-          <td class="py-3 px-4 sm:px-6 ${mangaResults[i].class}">${mangaResults[i].status}</td>
           <td class="py-3 px-4 sm:px-6">
-            <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full ${mangaResults[i].uptime === '100%' ? 'bg-green-500' : 'bg-red-500'} text-white">
-              ${mangaResults[i].uptime}
+            <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full ${mangaResults[i].status === 'Online' ? 'bg-green-500' : 'bg-red-500'} text-white">
+              ${mangaResults[i].status}
             </span>
           </td>
         </tr>
@@ -217,10 +215,9 @@
         <tr class="border-b border-gray-700 hover:bg-gray-600 transition fade-in">
           <td class="py-3 px-4 sm:px-6">${endpoint.service}</td>
           <td class="py-3 px-4 sm:px-6">${endpoint.name}</td>
-          <td class="py-3 px-4 sm:px-6 ${torrentResults[i].class}">${torrentResults[i].status}</td>
           <td class="py-3 px-4 sm:px-6">
-            <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full ${torrentResults[i].uptime === '100%' ? 'bg-green-500' : 'bg-red-500'} text-white">
-              ${torrentResults[i].uptime}
+            <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full ${torrentResults[i].status === 'Online' ? 'bg-green-500' : 'bg-red-500'} text-white">
+              ${torrentResults[i].status}
             </span>
           </td>
         </tr>

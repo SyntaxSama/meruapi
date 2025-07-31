@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const axiosRetry = require('axios-retry');
 
 // Torrent Servers
 const { scrapeAnimeTosho } = require('./scrapers/torrents/animetosho');
@@ -9,6 +10,7 @@ const { scrapeSeadex } = require('./scrapers/torrents/seadex');
 
 // Manga Servers
 const { searchMangaFreak, getMangaFreakChapters, getMangaFreakPages } = require('./scrapers/manga/mangafreak');
+const { searchComicK, getComicKChapters, getComicKPages } = require('./scrapers/manga/comick');
 
 // Streaming Servers
 const { scrapeZoroEpList, scrapeZoroEpStream, scrapeZoroSearch } = require('./scrapers/streaming/zorotv');
@@ -156,6 +158,77 @@ app.get('/api/streaming/zoro/stream', async (req, res) => {
 //          Manga Scrapers
 // ================================
 
+//
+// ========== ComicK ==========
+//
+app.get('/api/manga/comick/search', async (req, res) => {
+  const query = req.query.q;
+  if (!query) {
+    return res.status(400).json({ error: 'Query parameter "q" is required' });
+  }
+
+  try {
+    const results = await searchComicK(query);
+    if (!results.length) {
+      return res.status(404).json({ error: 'No manga found for the query' });
+    }
+    res.json(results);
+  } catch (error) {
+    console.error(`API error: ${error.message}`);
+    res.status(500).json({ error: 'Failed to search manga', details: error.message });
+  }
+});
+
+app.get('/api/manga/comick/chapters', async (req, res) => {
+  const hid = req.query.hid;
+  const page = parseInt(req.query.page) || undefined;
+  const limit = parseInt(req.query.limit) || undefined;
+
+  if (!hid) {
+    return res.status(400).json({ error: 'HID parameter is required' });
+  }
+  if (page && page < 1) {
+    return res.status(400).json({ error: 'Page must be at least 1' });
+  }
+  if (limit && limit < 1) {
+    return res.status(400).json({ error: 'Limit must be at least 1' });
+  }
+
+  try {
+    const { chapters, total } = await getComicKChapters(hid, page, limit);
+    if (!chapters.length) {
+      return res.status(404).json({ error: 'No chapters found for the manga' });
+    }
+    res.json({
+      total,
+      page: page || 1,
+      limit: limit || total,
+      totalPages: limit ? Math.ceil(total / limit) : 1,
+      chapters
+    });
+  } catch (error) {
+    console.error(`API error: ${error.message}`);
+    res.status(500).json({ error: 'Failed to fetch chapters', details: error.message });
+  }
+});
+
+app.get('/api/manga/comick/pages', async (req, res) => {
+  const hid = req.query.hid;
+  if (!hid) {
+    return res.status(400).json({ error: 'Chapter HID parameter is required' });
+  }
+
+  try {
+    const pages = await getComicKPages(hid);
+    if (!pages.length) {
+      return res.status(404).json({ error: 'No pages found for the chapter' });
+    }
+    res.json(pages);
+  } catch (error) {
+    console.error(`API error: ${error.message}`);
+    res.status(500).json({ error: 'Failed to fetch pages', details: error.message });
+  }
+});
 
 //
 // ========== MangaFreak ==========

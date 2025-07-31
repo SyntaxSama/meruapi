@@ -11,11 +11,14 @@
 
 ### 📚 Manga Endpoints
 
-| Description               | Example URL                                                                                       |
-| ------------------------- | ------------------------------------------------------------------------------------------------- |
-| Search Manga (MangaFreak) | `http://localhost:3000/api/manga/mangafreak?q=oshi%20no%20ko`                                     |
-| Get Chapters              | `http://localhost:3000/api/manga/mangafreak/chapters?url=https://mangafreak.net/Manga/Oshi_No_Ko` |
-| Get Pages                 | `http://localhost:3000/api/manga/mangafreak/pages?url=https://mangafreak.net/Read1_Oshi_No_Ko_1`  |
+|name | Description               | Example URL                                                                                       |
+|------| ------------------------- | ------------------------------------------------------------------------------------------------- |
+|MangaFreak | Search Manga | `http://localhost:3000/api/manga/mangafreak?q=oshi%20no%20ko`                                     |
+|MangaFreak | Get Chapters             | `http://localhost:3000/api/manga/mangafreak/chapters?url=https://mangafreak.net/Manga/Oshi_No_Ko` |
+|MangaFreak | Get Pages                 | `http://localhost:3000/api/manga/mangafreak/pages?url=https://mangafreak.net/Read1_Oshi_No_Ko_1`  |
+|ComicK | Search Manga | `http://localhost:3000/api/manga/comick/search?q=frieren` |
+|ComicK | Get Chapters | `http://localhost:3000/api/manga/comick/chapters?hid=0FiLFYD1&page=10` |
+|ComicK | Get Pages | `http://localhost:3000/api/manga/comick/pages?hid=ClqZrOJS` |
 
 ---
 

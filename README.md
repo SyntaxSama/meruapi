@@ -11,6 +11,7 @@
 | Provider   | Type             |
 | ---------- | ---------------- |
 | MangaFreak | Manga            |
+| ComicK     | Manga            |
 | AnimeEgg   | Online Streaming |
 | ZoroTV     | Online Streaming |
 | AnimePahe  | Online Streaming |
@@ -26,7 +27,6 @@
 | Provider   | Type             |
 | ---------- | ---------------- |
 | MangaWorld | Manga            |
-| ComicK     | Manga            |
 | AnimeWorld | Online Streaming |
 | AnimeItal  | Online Streaming |
 
