@@ -14,6 +14,7 @@ const { searchMangaFreak, getMangaFreakChapters, getMangaFreakPages } = require(
 const { scrapeZoroEpList, scrapeZoroEpStream, scrapeZoroSearch } = require('./scrapers/streaming/zorotv');
 const { scrapeAnimeggSearch, scrapeAnimeggEpList, scrapeAnimeggEpStream } = require('./scrapers/streaming/animegg');
 
+const { scrapeAnimepaheSearch, scrapeAnimepaheEpList, scrapeAnimepaheEpStream } = require('./scrapers/streaming/animepahe');
 
 const app = express();
 app.use(express.json());
@@ -27,6 +28,44 @@ app.get('/api', (req, res) => {
 //        Streaming Scrapers
 // ================================
 
+//
+// ========== Animepahe ==========
+//
+app.get('/api/streaming/animepahe/search', async (req, res) => {
+  try {
+    const query = req.query.q;
+    if (!query) return res.status(400).json({ error: 'Query parameter is required' });
+    const results = await scrapeAnimepaheSearch(query);
+    res.json(results);
+  } catch (err) {
+    console.error(`Error in /api/streaming/animepahe/search: ${err.message}`);
+    res.status(err.cause?.statusCode || 500).json({ error: err.message });
+  }
+});
+
+app.get('/api/streaming/animepahe/episodes', async (req, res) => {
+  try {
+    const animeSessionId = req.query.anime_session_id;
+    if (!animeSessionId) return res.status(400).json({ error: 'Anime session ID parameter is required' });
+    const results = await scrapeAnimepaheEpList(animeSessionId);
+    res.json(results);
+  } catch (err) {
+    console.error(`Error in /api/streaming/animepahe/episodes: ${err.message}`);
+    res.status(err.cause?.statusCode || 500).json({ error: err.message });
+  }
+});
+
+app.get('/api/streaming/animepahe/stream', async (req, res) => {
+  try {
+    const url = req.query.url;
+    if (!url) return res.status(400).json({ error: 'URL parameter is required' });
+    const results = await scrapeAnimepaheEpStream(url);
+    res.json(results);
+  } catch (err) {
+    console.error(`Error in /api/streaming/animepahe/stream: ${err.message}`);
+    res.status(err.cause?.statusCode || 500).json({ error: err.message });
+  }
+});
 
 //
 // ========== AnimeGG ==========
