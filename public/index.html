@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MeruAPI Status</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semver/7.5.4/semver.min.js"></script>
   <style>
     .status-ok::before {
       content: '✔';
@@ -43,6 +44,17 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+    .progress-bar {
+      height: 8px;
+      background-color: #4b5563;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background-color: #3b82f6;
+      transition: width 0.3s ease-in;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-b from-gray-900 to-gray-800 min-h-screen text-gray-200 font-sans">
@@ -54,9 +66,13 @@
       <p class="mt-2 text-gray-400 text-sm sm:text-base">Real-time monitoring of MeruAPI services</p>
     </header>
 
-    <div id="loading" class="flex justify-center items-center mb-8">
+    <div id="loading" class="flex flex-col justify-center items-center mb-8">
       <div class="spinner"></div>
-      <span class="ml-3 text-gray-300">Checking API states... this can take a minute...</span>
+      <span id="current-check" class="mt-3 text-gray-300 text-sm">Checking API states...</span>
+      <div class="w-64 mt-2 progress-bar">
+        <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%"></div>
+      </div>
+      <span id="progress-percent" class="mt-1 text-gray-400 text-xs">0%</span>
     </div>
 
     <section id="status-tables" class="space-y-6 hidden">
@@ -141,9 +157,9 @@
         { service: 'MangaFreak', name: 'Search', url: 'http://localhost:3000/api/manga/mangafreak?q=one piece' },
         { service: 'MangaFreak', name: 'Chapters', url: 'http://localhost:3000/api/manga/mangafreak/chapters?url=https://mangafreak.net/Manga/One_Piece' },
         { service: 'MangaFreak', name: 'Pages', url: 'http://localhost:3000/api/manga/mangafreak/pages?url=https://mangafreak.net/Read1_One_Piece_1' },
-        { service: 'ComicK', name: 'Search', url: 'http://localhost:3000/api/manga/comick/search?q=frieren'},
-        { service: 'ComicK', name: 'Chapters', url: 'http://localhost:3000/api/manga/comick/chapters?hid=0FiLFYD1&page=10'},
-        { service: 'ComicK', name: 'Pages', url: 'http://localhost:3000/api/manga/comick/pages?hid=ClqZrOJS'}
+        { service: 'ComicK', name: 'Search', url: 'http://localhost:3000/api/manga/comick/search?q=frieren' },
+        { service: 'ComicK', name: 'Chapters', url: 'http://localhost:3000/api/manga/comick/chapters?hid=0FiLFYD1&page=10' },
+        { service: 'ComicK', name: 'Pages', url: 'http://localhost:3000/api/manga/comick/pages?hid=ClqZrOJS' }
       ],
       torrents: [
         { service: 'AnimeTosho', name: 'Search', url: 'http://localhost:3000/api/torrent/animetosho?query=one piece' },
@@ -153,26 +169,36 @@
       ]
     };
 
-    async function checkEndpoint(endpoint) {
-      try {
-        const response = await fetch(endpoint.url);
-        const data = await response.json();
-        if (response.ok && (Array.isArray(data) ? data.length > 0 : data.result ? data.result.length > 0 : Object.keys(data).length > 0)) {
-          return { class: 'status-ok', status: 'Online' };
-        } else {
+    async function checkEndpoint(endpoint, retryCount = 2) {
+      for (let i = 0; i <= retryCount; i++) {
+        try {
+          const response = await fetch(endpoint.url, { timeout: 10000 });
+          const data = await response.json();
+          if (response.ok && (Array.isArray(data) ? data.length > 0 : data.result ? data.result.length > 0 : Object.keys(data).length > 0)) {
+            return { class: 'status-ok', status: 'Online' };
+          }
+          return { class: 'status-error', status: 'Offline' };
+        } catch (err) {
+          if (i < retryCount) {
+            await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+            continue;
+          }
           return { class: 'status-error', status: 'Offline' };
         }
-      } catch (err) {
-        return { class: 'status-error', status: 'Offline' };
       }
     }
 
+
     async function updateStatus() {
       const loadingDiv = document.getElementById('loading');
+      const currentCheck = document.getElementById('current-check');
+      const progressBarFill = document.getElementById('progress-bar-fill');
+      const progressPercent = document.getElementById('progress-percent');
       const tablesSection = document.getElementById('status-tables');
       const streamingTbody = document.getElementById('streaming-status');
       const mangaTbody = document.getElementById('manga-status');
       const torrentTbody = document.getElementById('torrent-status');
+      const apiVersion = document.getElementById('api-version');
 
       streamingTbody.innerHTML = '';
       mangaTbody.innerHTML = '';
@@ -181,16 +207,38 @@
       loadingDiv.classList.remove('hidden');
       tablesSection.classList.add('hidden');
 
-      const [streamingResults, mangaResults, torrentResults] = await Promise.all([
-        Promise.all(endpoints.streaming.map(checkEndpoint)),
-        Promise.all(endpoints.manga.map(checkEndpoint)),
-        Promise.all(endpoints.torrents.map(checkEndpoint))
-      ]);
+      const allEndpoints = [
+        ...endpoints.streaming.map(e => ({ ...e, category: 'streaming' })),
+        ...endpoints.manga.map(e => ({ ...e, category: 'manga' })),
+        ...endpoints.torrents.map(e => ({ ...e, category: 'torrents' }))
+      ];
+      const totalEndpoints = allEndpoints.length;
+      let completed = 0;
+      const streamingResults = [];
+      const mangaResults = [];
+      const torrentResults = [];
+
+      for (const endpoint of allEndpoints) {
+        currentCheck.textContent = `Checking ${endpoint.service} ${endpoint.name}...`;
+        const result = await checkEndpoint(endpoint);
+        completed++;
+        const percent = Math.round((completed / totalEndpoints) * 100);
+        progressBarFill.style.width = `${percent}%`;
+        progressPercent.textContent = `${percent}%`;
+
+        if (endpoint.category === 'streaming') {
+          streamingResults.push(result);
+        } else if (endpoint.category === 'manga') {
+          mangaResults.push(result);
+        } else {
+          torrentResults.push(result);
+        }
+      }
 
       streamingTbody.innerHTML = endpoints.streaming.map((endpoint, i) => `
         <tr class="border-b border-gray-700 hover:bg-gray-600 transition fade-in">
           <td class="py-3 px-4 sm:px-6">${endpoint.service}</td>
-          <td class="py-3 px-4 sm:px-6">${endpoint.name}</td>
+          <td class="py-3 px-4 sm:px-6" title="${endpoint.url}">${endpoint.name}</td>
           <td class="py-3 px-4 sm:px-6">
             <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full ${streamingResults[i].status === 'Online' ? 'bg-green-500' : 'bg-red-500'} text-white">
               ${streamingResults[i].status}
@@ -202,7 +250,7 @@
       mangaTbody.innerHTML = endpoints.manga.map((endpoint, i) => `
         <tr class="border-b border-gray-700 hover:bg-gray-600 transition fade-in">
           <td class="py-3 px-4 sm:px-6">${endpoint.service}</td>
-          <td class="py-3 px-4 sm:px-6">${endpoint.name}</td>
+          <td class="py-3 px-4 sm:px-6" title="${endpoint.url}">${endpoint.name}</td>
           <td class="py-3 px-4 sm:px-6">
             <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full ${mangaResults[i].status === 'Online' ? 'bg-green-500' : 'bg-red-500'} text-white">
               ${mangaResults[i].status}
@@ -214,7 +262,7 @@
       torrentTbody.innerHTML = endpoints.torrents.map((endpoint, i) => `
         <tr class="border-b border-gray-700 hover:bg-gray-600 transition fade-in">
           <td class="py-3 px-4 sm:px-6">${endpoint.service}</td>
-          <td class="py-3 px-4 sm:px-6">${endpoint.name}</td>
+          <td class="py-3 px-4 sm:px-6" title="${endpoint.url}">${endpoint.name}</td>
           <td class="py-3 px-4 sm:px-6">
             <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full ${torrentResults[i].status === 'Online' ? 'bg-green-500' : 'bg-red-500'} text-white">
               ${torrentResults[i].status}
