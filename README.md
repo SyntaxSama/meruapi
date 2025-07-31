@@ -9,6 +9,7 @@ MeruAPI Is an API dedicated for online streaming, manga, torrenting and light no
 | Manga Freak                | Manga |
 | AnimeEgg                | Online Streaming |
 | ZoroTV                 | Online Streaming |
+| Animepahe                 | Online Streaming |
 | Animetosho               | Torrents |
 | Anirena               | Torrents |
 | Nyaa               | Torrents |
