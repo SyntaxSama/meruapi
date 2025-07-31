@@ -22,17 +22,19 @@ MeruAPI Is an API dedicated for online streaming, manga, torrenting and light no
 | Anime World                | Online Streaming |
 | Anime Ital                 | Online Streaming |
 
+
+
 # API Endpoints
 | MeruAPI Status Endpoint | Link |
 | ------------------------ | ---- |
 | MeruAPI |  http://localhost:3000/api |
-
+#
 | Manga Provider             | Example |                                                              
 | -------------------------- | -------- |
 | Manga Freak                | http://localhost:3000/api/manga/mangafreak?q=oshi%20no%20ko |
 | Manga Freak                | http://localhost:3000/api/manga/mangafreak/chapters?url=https://mangafreak.net/Manga/Oshi_No_Ko |
 | Manga Freak                | http://localhost:3000/api/manga/mangafreak/pages?url=https://mangafreak.net/Read1_Oshi_No_Ko_1 |
-
+#
 | Streaming Provider (Online)| Example |                                                              
 | -------------------------- | -------- |
 | AnimeEgg                | http://localhost:3000/api/streaming/animegg/search?q=dandadan |
@@ -44,7 +46,7 @@ MeruAPI Is an API dedicated for online streaming, manga, torrenting and light no
 | Animepahe                 | http://localhost:3000/api/streaming/animepahe/search?q=solo%20leveling |
 | Animepahe                 | http://localhost:3000/api/streaming/animepahe/episodes?anime_session_id=1895c0ee-ea1d-06a2-9068-da06ae3768af |
 | Animepahe                 | http://localhost:3000/api/streaming/animepahe/stream?url=https://animepahe.ru/play/1895c0ee-ea1d-06a2-9068-da06ae3768af/70f1a28acb5b822b501d4174f256dbd6635e19aad4633b94147795b070542d6f |
-
+#
 | Torrent Provider           |  Example |                                                              
 | -------------------------- | -------- |
 | Animetosho               | http://localhost:3000/api/torrent/animetosho?query=solo%20leveling |
