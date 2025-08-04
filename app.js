@@ -25,6 +25,7 @@ const { scrapeNovelbinSearch, scrapeNovelbinChapters, scrapeNovelbinChapterConte
 // Metadata
 const { searchTheTVDB, scrapeTVDBMetadata } = require('./scrapers/metadata/thetvdb');
 const { fetchNewAnimeEpisodes } = require('./scrapers/metadata/newepisodes');
+const { fetchTrendingAnime } = require('./scrapers/metadata/trending');
 
 
 const app = express();
@@ -557,6 +558,19 @@ app.get('/api/metadata/animeapi/new', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const data = await fetchNewAnimeEpisodes(page);
+
+    const filteredData = data.map(({ link_url, embed_url, ...rest }) => rest);
+
+    res.json(filteredData);
+  } catch (err) {
+    console.error('[API Route Error]', err.message);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+app.get('/api/metadata/animeapi/trending', async (req, res) => {
+  try {
+    const data = await fetchTrendingAnime();
 
     const filteredData = data.map(({ link_url, embed_url, ...rest }) => rest);
 

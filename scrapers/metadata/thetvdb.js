@@ -1,5 +1,4 @@
 const { chromium } = require('playwright');
-const fs = require('fs/promises');
 
 const THETVDB_BASE = 'https://www.thetvdb.com';
 
@@ -16,28 +15,22 @@ async function searchTheTVDB(query) {
     try {
         const page = await context.newPage();
 
-        // Go to search page
         const searchUrl = `${THETVDB_BASE}/search?query=${encodeURIComponent(query)}`;
         await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-        // Wait for Algolia search list to load
         await page.waitForSelector('.ais-Hits-list.list-unstyled li a', { timeout: 15000 });
 
-        // Grab first result URL
         const resultUrl = await page.$eval('.ais-Hits-list.list-unstyled li a', el =>
             new URL(el.getAttribute('href'), location.origin).href
         );
 
         if (!resultUrl) {
-            console.warn(`No results for "${query}"`);
             return { results: [], suggestions: [] };
         }
 
-        // Navigate to series detail page
         await page.goto(resultUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
         await page.waitForSelector('h1', { timeout: 15000 });
 
-        // Scrape metadata
         const metadata = await page.evaluate(() => {
             const title = document.querySelector('h1')?.textContent.trim() || '';
 
@@ -55,8 +48,6 @@ async function searchTheTVDB(query) {
 
     } catch (err) {
         console.error('Search error:', err.message);
-        await fs.writeFile('debug.html', await page.content());
-        await page.screenshot({ path: 'debug.png' });
         return { results: [], suggestions: [] };
     } finally {
         await browser.close();
