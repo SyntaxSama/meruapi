@@ -11,12 +11,15 @@ const { scrapeSeadex } = require('./scrapers/torrents/seadex');
 // Manga Servers
 const { searchMangaFreak, getMangaFreakChapters, getMangaFreakPages } = require('./scrapers/manga/mangafreak');
 const { searchComicK, getComicKChapters, getComicKPages } = require('./scrapers/manga/comick');
+const { searchMangaFox, getMangaFoxChapters, getMangaFoxPages } = require('./scrapers/manga/mangafox');
+const { searchMangaPill, getMangaPillChapters, getMangaPillPages } = require('./scrapers/manga/mangapill');
 
 // Streaming Servers
 const { scrapeZoroEpList, scrapeZoroEpStream, scrapeZoroSearch } = require('./scrapers/streaming/zorotv');
 const { scrapeAnimeggSearch, scrapeAnimeggEpList, scrapeAnimeggEpStream } = require('./scrapers/streaming/animegg');
 
 const { scrapeAnimepaheSearch, scrapeAnimepaheEpList, scrapeAnimepaheEpStream } = require('./scrapers/streaming/animepahe');
+const { scrape123AnimesSearch, scrape123AnimesEpList, scrape123AnimesEpStream } = require('./scrapers/streaming/123animes');
 
 const app = express();
 app.use(express.json());
@@ -29,6 +32,52 @@ app.get('/api', (req, res) => {
 // ================================
 //        Streaming Scrapers
 // ================================
+
+
+//
+// ========== 123Animes ==========
+//
+app.get('/api/streaming/123animes/search', async (req, res) => {
+  try {
+    const query = req.query.q;
+    if (!query) {
+      return res.status(400).json({ error: 'Query parameter is required' });
+    }
+    const results = await scrape123AnimesSearch(query);
+    res.json(results);
+  } catch (err) {
+    console.error(`Error in /api/streaming/123animes/search: ${err.message}`);
+    res.status(err.cause?.statusCode || 500).json({ error: err.message });
+  }
+});
+
+app.get('/api/streaming/123animes/episodes', async (req, res) => {
+  try {
+    const url = req.query.url;
+    if (!url) {
+      return res.status(400).json({ error: 'URL parameter is required' });
+    }
+    const episodeList = await scrape123AnimesEpList(url);
+    res.json(episodeList);
+  } catch (err) {
+    console.error(`Error in /api/streaming/123animes/episodes: ${err.message}`);
+    res.status(err.cause?.statusCode || 500).json({ error: err.message });
+  }
+});
+
+app.get('/api/streaming/123animes/stream', async (req, res) => {
+  try {
+    const url = req.query.url;
+    if (!url) {
+      return res.status(400).json({ error: 'URL parameter is required' });
+    }
+    const streamSources = await scrape123AnimesEpStream(url);
+    res.json(streamSources);
+  } catch (err) {
+    console.error(`Error in /api/streaming/123animes/stream: ${err.message}`);
+    res.status(err.cause?.statusCode || 500).json({ error: err.message });
+  }
+});
 
 //
 // ========== Animepahe ==========
@@ -233,7 +282,7 @@ app.get('/api/manga/comick/pages', async (req, res) => {
 //
 // ========== MangaFreak ==========
 //
-app.get('/api/manga/mangafreak', async (req, res) => {
+app.get('/api/manga/mangafreak/search', async (req, res) => {
   const { q } = req.query;
   if (!q) return res.status(400).json({ error: 'Missing query' });
 
@@ -273,6 +322,113 @@ app.get('/api/manga/mangafreak/pages', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch pages' });
   }
 });
+
+
+//
+// ========== MangaFox ==========
+//
+app.get('/api/manga/mangafox/search', async (req, res) => {
+  const { q } = req.query;
+  if (!q) return res.status(400).json({ error: 'Missing query' });
+
+  try {
+    const results = await searchMangaFox(q);
+    res.json(results);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Failed to search MangaFox' });
+  }
+});
+
+app.get('/api/manga/mangafox/chapters', async (req, res) => {
+  const { url } = req.query;
+  if (!url || !url.startsWith('http'))
+    return res.status(400).json({ error: 'Invalid manga url' });
+
+  try {
+    const chapters = await getMangaFoxChapters(url);
+    res.json(chapters);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Failed to fetch chapters' });
+  }
+});
+
+app.get('/api/manga/mangafox/pages', async (req, res) => {
+  const { url } = req.query;
+  if (!url || !url.startsWith('http'))
+    return res.status(400).json({ error: 'Invalid chapter url' });
+
+  try {
+    const pages = await getMangaFoxPages(url);
+    res.json(pages);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Failed to fetch pages' });
+  }
+});
+
+//
+// ========== MangaPill ==========
+//
+app.get('/api/manga/mangapill/search', async (req, res) => {
+  const { q } = req.query;
+  if (!q) return res.status(400).json({ error: 'Missing query' });
+
+  try {
+    const results = await searchMangaPill(q);
+    res.json(results);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Failed to search MangaPill' });
+  }
+});
+
+app.get('/api/manga/mangapill/chapters', async (req, res) => {
+  const { url } = req.query;
+  if (!url || !url.startsWith('http'))
+    return res.status(400).json({ error: 'Invalid manga url' });
+
+  try {
+    const chapters = await getMangaPillChapters(url);
+    res.json(chapters);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Failed to fetch chapters' });
+  }
+});
+
+app.get('/api/manga/mangapill/pages', async (req, res) => {
+  const { url } = req.query;
+  if (!url || !url.startsWith('http'))
+    return res.status(400).json({ error: 'Invalid chapter url' });
+
+  try {
+    const pages = await getMangaPillPages(url);
+    res.json(pages);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Failed to fetch pages' });
+  }
+});
+
+app.get('/api/manga/mangapill/image', async (req, res) => {
+  const { url } = req.query;
+  if (!url || !url.startsWith('http'))
+    return res.status(400).json({ error: 'Invalid image url' });
+
+  try {
+    const imageData = await getMangaPillImage(url);
+    if (!imageData) {
+      return res.status(500).json({ error: 'Failed to fetch image' });
+    }
+    res.json({ image: imageData });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Failed to fetch image' });
+  }
+});
+
 
 // ================================
 //     Anime Torrent Scrapers
@@ -337,8 +493,6 @@ app.get('/api/torrent/seadex', async (req, res) => {
     res.status(500).json({ error: 'Failed to scrape torrents', details: error.message });
   }
 });
-
-
 
 
 // ================================

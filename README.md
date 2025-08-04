@@ -12,9 +12,12 @@
 | ---------- | ---------------- |
 | MangaFreak | Manga            |
 | ComicK     | Manga            |
+| MangaFox   | Manga            |
+| MangaPill  | Manga            |
 | AnimeEgg   | Online Streaming |
 | ZoroTV     | Online Streaming |
-| AnimePahe  | Online Streaming |
+| ~~AnimePahe~~ (Recoding) | Online Streaming |
+| 123Animes  | Online Streaming |
 | AnimeTosho | Torrents         |
 | AniRena    | Torrents         |
 | Nyaa       | Torrents         |
@@ -52,10 +55,12 @@ You can find the full list of API endpoints in the [ENDPOINTS.md](./ENDPOINTS.md
    npm install
    ```
 
-3. **Run the API**
+3. **Run the API / Run It In Dev Mode**
 
    ```bash
-   node app.js
+   node app.js # Runs normally
+   
+   npm run dev # Runs in dev mode
    ```
 
 ---
