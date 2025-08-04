@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,26 +13,39 @@
       font-weight: bold;
       margin-right: 0.5rem;
     }
+
     .status-error::before {
       content: '✖';
       color: #ef4444;
       font-weight: bold;
       margin-right: 0.5rem;
     }
+
     .fade-in {
       animation: fadeIn 0.5s ease-in;
     }
+
     @keyframes fadeIn {
-      0% { opacity: 0; transform: translateY(10px); }
-      100% { opacity: 1; transform: translateY(0); }
+      0% {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
+
     .table-container {
       transition: max-height 0.3s ease-in-out;
       overflow: hidden;
     }
+
     .table-container.collapsed {
       max-height: 0;
     }
+
     .spinner {
       border: 4px solid rgba(255, 255, 255, 0.2);
       border-left-color: #3b82f6;
@@ -40,15 +54,20 @@
       width: 24px;
       height: 24px;
     }
+
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
+
     .progress-bar {
       height: 8px;
       background-color: #4b5563;
       border-radius: 4px;
       overflow: hidden;
     }
+
     .progress-bar-fill {
       height: 100%;
       background-color: #3b82f6;
@@ -56,10 +75,12 @@
     }
   </style>
 </head>
+
 <body class="bg-gradient-to-b from-gray-900 to-gray-800 min-h-screen text-gray-200 font-sans">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <header class="text-center mb-10">
-      <h1 class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+      <h1
+        class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
         MeruAPI Status
       </h1>
       <p class="mt-2 text-gray-400 text-sm sm:text-base">Real-time monitoring of MeruAPI services</p>
@@ -131,11 +152,52 @@
           </table>
         </div>
       </div>
+
+      <div class="bg-gray-800 rounded-xl shadow-2xl overflow-hidden">
+        <div class="flex justify-between items-center p-4 cursor-pointer" onclick="toggleTable('metadata-table')">
+          <h2 class="text-xl font-semibold text-cyan-400">Metadata Services</h2>
+          <span class="text-gray-400">▼</span>
+        </div>
+        <div id="metadata-table" class="table-container">
+          <table class="w-full table-auto">
+            <thead>
+              <tr class="bg-gray-700 text-gray-300 uppercase text-xs sm:text-sm leading-normal">
+                <th class="py-3 px-4 sm:px-6 text-left">Service</th>
+                <th class="py-3 px-4 sm:px-6 text-left">Endpoint</th>
+                <th class="py-3 px-4 sm:px-6 text-left">Status</th>
+              </tr>
+            </thead>
+            <tbody id="metadata-status" class="text-gray-200 text-sm font-light"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="bg-gray-800 rounded-xl shadow-2xl overflow-hidden">
+        <div class="flex justify-between items-center p-4 cursor-pointer" onclick="toggleTable('lnovel-table')">
+          <h2 class="text-xl font-semibold text-cyan-400">Light Novel Services</h2>
+          <span class="text-gray-400">▼</span>
+        </div>
+        <div id="lnovel-table" class="table-container">
+          <table class="w-full table-auto">
+            <thead>
+              <tr class="bg-gray-700 text-gray-300 uppercase text-xs sm:text-sm leading-normal">
+                <th class="py-3 px-4 sm:px-6 text-left">Service</th>
+                <th class="py-3 px-4 sm:px-6 text-left">Endpoint</th>
+                <th class="py-3 px-4 sm:px-6 text-left">Status</th>
+              </tr>
+            </thead>
+            <tbody id="lnovel-status" class="text-gray-200 text-sm font-light"></tbody>
+          </table>
+        </div>
+      </div>
+
     </section>
 
     <footer class="text-center mt-8">
-      <p class="text-gray-400 text-sm">Updates every 5 minutes | Last updated: <span id="last-updated">Checking...</span></p>
-      <p class="text-gray-500 text-xs mt-2">Note: Placeholder URLs for chapters, pages, episodes, and streams should be updated with valid URLs from search results.</p>
+      <p class="text-gray-400 text-sm">Updates every 5 minutes | Last updated: <span
+          id="last-updated">Checking...</span></p>
+      <p class="text-gray-500 text-xs mt-2">Note: Placeholder URLs for chapters, pages, episodes, and streams should be
+        updated with valid URLs from search results.</p>
     </footer>
   </div>
 
@@ -151,9 +213,9 @@
         { service: 'Animepahe', name: 'Search', url: 'http://localhost:3000/api/streaming/animepahe/search?q=solo%20leveling' },
         { service: 'Animepahe', name: 'Episodes', url: 'http://localhost:3000/api/streaming/animepahe/episodes?anime_session_id=1895c0ee-ea1d-06a2-9068-da06ae3768af' },
         { service: 'Animepahe', name: 'Stream', url: 'http://localhost:3000/api/streaming/animepahe/stream?url=https://animepahe.ru/play/1895c0ee-ea1d-06a2-9068-da06ae3768af/70f1a28acb5b822b501d4174f256dbd6635e19aad4633b94147795b070542d6f' },
-        { service: '123animes', name: 'Search', url: 'http://localhost:3000/api/streaming/123animes/search?q=death%20note'},
-        { service: '123animes', name: 'Episodes', url: 'http://localhost:3000/api/streaming/123animes/episodes?url=https://w1.123animes.ru/anime/death-note'},
-        { service: '123animes', name: 'Stream', url: 'http://localhost:3000/api/streaming/123animes/stream?url=https://w1.123animes.ru/anime/death-note/episode/1'}
+        { service: '123animes', name: 'Search', url: 'http://localhost:3000/api/streaming/123animes/search?q=death%20note' },
+        { service: '123animes', name: 'Episodes', url: 'http://localhost:3000/api/streaming/123animes/episodes?url=https://w1.123animes.ru/anime/death-note' },
+        { service: '123animes', name: 'Stream', url: 'http://localhost:3000/api/streaming/123animes/stream?url=https://w1.123animes.ru/anime/death-note/episode/1' }
 
       ],
       manga: [
@@ -175,6 +237,17 @@
         { service: 'Nyaa', name: 'Search', url: 'http://localhost:3000/api/torrent/nyaa?query=one piece' },
         { service: 'AniRena', name: 'Search', url: 'http://localhost:3000/api/torrent/anirena?query=one piece' },
         { service: 'Seadex', name: 'Search', url: 'http://localhost:3000/api/torrent/seadex?query=Alya%20Sometimes%20Hides%20Her%20Feelings%20in%20Russian' }
+      ],
+      metadata: [
+        { service: 'TheTVDB', name: 'Data', url: 'http://localhost:3000/api/metadata/thetvdb/data?url=https://www.thetvdb.com/series/kaoru-hana-wa-rin-to-saku' },
+        { service: 'TheTVDB', name: 'Search', url: 'http://localhost:3000/api/metadata/thetvdb/search?q=the%20fragerant%20flower%20blooms%20with%20dignity' },
+        { service: 'AnimeAPI', name: 'Trending', url: 'http://localhost:3000/api/metadata/animeapi/trending' },
+        { service: 'AnimeAPI', name: 'Latest Releases', url: 'http://localhost:3000/api/metadata/animeapi/new' }
+      ],
+      lnovel: [
+        { service: 'NovelBin', name: 'Search', url: 'http://localhost:3000/api/novels/novelbin/search?q=classroom%20of%20the%20elite' },
+        { service: 'NovelBin', name: 'Chapters', url: 'http://localhost:3000/api/novels/novelbin/chapters?url=https://novelbin.me/novel-book/classroom-of-the-elite' },
+        { service: 'NovelBin', name: 'Read', url: 'http://localhost:3000/api/novels/novelbin/read?url=https://novelbin.me/novel-book/classroom-of-the-elite/chapter-vol-1-ch-1' }
       ]
     };
 
@@ -207,6 +280,8 @@
       const streamingTbody = document.getElementById('streaming-status');
       const mangaTbody = document.getElementById('manga-status');
       const torrentTbody = document.getElementById('torrent-status');
+      const metadataTbody = document.getElementById('metadata-status');
+      const lnovelTbody = document.getElementById('lnovel-status');
       const apiVersion = document.getElementById('api-version');
 
       streamingTbody.innerHTML = '';
@@ -219,13 +294,18 @@
       const allEndpoints = [
         ...endpoints.streaming.map(e => ({ ...e, category: 'streaming' })),
         ...endpoints.manga.map(e => ({ ...e, category: 'manga' })),
-        ...endpoints.torrents.map(e => ({ ...e, category: 'torrents' }))
+        ...endpoints.torrents.map(e => ({ ...e, category: 'torrents' })),
+        ...endpoints.metadata.map(e => ({ ...e, category: 'metadata' })),
+        ...endpoints.lnovel.map(e => ({ ...e, category: 'lnovel' }))
       ];
       const totalEndpoints = allEndpoints.length;
       let completed = 0;
       const streamingResults = [];
       const mangaResults = [];
       const torrentResults = [];
+      const metadataResults = [];
+      const lnovelResults = [];
+
 
       for (const endpoint of allEndpoints) {
         currentCheck.textContent = `Checking ${endpoint.service} ${endpoint.name}...`;
@@ -235,7 +315,11 @@
         progressBarFill.style.width = `${percent}%`;
         progressPercent.textContent = `${percent}%`;
 
-        if (endpoint.category === 'streaming') {
+        if (endpoint.category === 'metadata') {
+          metadataResults.push(result);
+        } else if (endpoint.category === 'lnovel') {
+          lnovelResults.push(result);
+        } else if (endpoint.category === 'streaming') {
           streamingResults.push(result);
         } else if (endpoint.category === 'manga') {
           mangaResults.push(result);
@@ -280,6 +364,31 @@
         </tr>
       `).join('');
 
+      metadataTbody.innerHTML = endpoints.metadata.map((endpoint, i) => `
+  <tr class="border-b border-gray-700 hover:bg-gray-600 transition fade-in">
+    <td class="py-3 px-4 sm:px-6">${endpoint.service}</td>
+    <td class="py-3 px-4 sm:px-6" title="${endpoint.url}">${endpoint.name}</td>
+    <td class="py-3 px-4 sm:px-6">
+      <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full ${metadataResults[i].status === 'Online' ? 'bg-green-500' : 'bg-red-500'} text-white">
+        ${metadataResults[i].status}
+      </span>
+    </td>
+  </tr>
+`).join('');
+
+      lnovelTbody.innerHTML = endpoints.lnovel.map((endpoint, i) => `
+  <tr class="border-b border-gray-700 hover:bg-gray-600 transition fade-in">
+    <td class="py-3 px-4 sm:px-6">${endpoint.service}</td>
+    <td class="py-3 px-4 sm:px-6" title="${endpoint.url}">${endpoint.name}</td>
+    <td class="py-3 px-4 sm:px-6">
+      <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full ${lnovelResults[i].status === 'Online' ? 'bg-green-500' : 'bg-red-500'} text-white">
+        ${lnovelResults[i].status}
+      </span>
+    </td>
+  </tr>
+`).join('');
+
+
       loadingDiv.classList.add('hidden');
       tablesSection.classList.remove('hidden');
 
@@ -298,4 +407,5 @@
     setInterval(updateStatus, 300000);
   </script>
 </body>
+
 </html>

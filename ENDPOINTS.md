@@ -1,7 +1,7 @@
-## 📡 MeruAPI Endpoint Reference
+## MeruAPI Endpoint Reference
 
 
-### 🔧 API Status
+### API Status
 
 | Name    | Endpoint                    |
 | ------- | --------------------------- |
@@ -9,7 +9,7 @@
 
 ---
 
-### 📚 Manga Endpoints
+### Manga Endpoints
 
 |name | Description               | Example URL                                                                                       |
 |------| ------------------------- | ------------------------------------------------------------------------------------------------- |
@@ -28,7 +28,7 @@
 
 ---
 
-### 📺 Streaming Endpoints
+### Streaming Endpoints
 
 **AnimeEgg**
 
@@ -56,7 +56,26 @@
 
 ---
 
-### 🪠 Torrent Endpoints
+### Light Novel Endpoints
+| Provider | Description | Example URL |
+| -------- | ----------- | ----------- | 
+| NovelBin | Search | `http://localhost:3000/api/novels/novelbin/search?q=classroom%20of%20the%20elite` |
+| NovelBin | Chapters | `http://localhost:3000/api/novels/novelbin/chapters?url=https://novelbin.me/novel-book/classroom-of-the-elite` |
+| NovelBin | Read Chapter | `http://localhost:3000/api/novels/novelbin/read?url=https://novelbin.me/novel-book/classroom-of-the-elite/chapter-vol-1-ch-1` |
+
+---
+
+### Metadata Endpoints
+| Provider   | Endpoint Example                                                                                          | Optional Params | 
+| ---------- | ------------------------------------------------------- | ------- |
+| AnimeAPI | `http://localhost:3000/api/metadata/animeapi/trending`                                      |
+| AnimeAPI | `http://localhost:3000/api/metadata/animeapi/new`                                      | `?page={number}` |
+| TheTVDB | `http://localhost:3000/api/metadata/thetvdb/data?url=https://www.thetvdb.com/series/kaoru-hana-wa-rin-to-saku` |
+| TheTVDB | `http://localhost:3000/api/metadata/thetvdb/search?q=the%20fragerant%20flower%20blooms%20with%20dignity` |
+
+---
+
+### Torrent Endpoints
 
 | Provider   | Endpoint Example                                                                                          |
 | ---------- | --------------------------------------------------------------------------------------------------------- |
