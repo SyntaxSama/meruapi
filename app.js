@@ -24,6 +24,7 @@ const { scrapeNovelbinSearch, scrapeNovelbinChapters, scrapeNovelbinChapterConte
 
 // Metadata
 const { searchTheTVDB, scrapeTVDBMetadata } = require('./scrapers/metadata/thetvdb');
+const { fetchNewAnimeEpisodes } = require('./scrapers/metadata/newepisodes');
 
 
 const app = express();
@@ -550,6 +551,23 @@ app.get('/api/torrent/seadex', async (req, res) => {
 // ================================
 
 //
+// ========== AnimeAPI ==========
+//
+app.get('/api/metadata/animeapi/new', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const data = await fetchNewAnimeEpisodes(page);
+
+    const filteredData = data.map(({ link_url, embed_url, ...rest }) => rest);
+
+    res.json(filteredData);
+  } catch (err) {
+    console.error('[API Route Error]', err.message);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+//
 // ========== TheTVDB ==========
 //
 app.get('/api/metadata/thetvdb/search', async (req, res) => {
@@ -558,10 +576,16 @@ app.get('/api/metadata/thetvdb/search', async (req, res) => {
     if (!q) {
       return res.status(400).json({ error: 'Query parameter "q" is required' });
     }
-    const results = await searchTheTVDB(q);
+
+    console.log(`[Search] Query: ${q}`);
+    const results = await Promise.race([
+      searchTheTVDB(q)
+    ]);
+
     res.json(results);
   } catch (err) {
-    res.status(err.cause?.statusCode || 500).json({ error: err.message });
+    console.error('Search endpoint error:', err.message);
+    res.status(err.cause?.statusCode || 500).json({ error: err.message || 'Internal server error' });
   }
 });
 
@@ -572,7 +596,15 @@ app.get('/api/metadata/thetvdb/data', async (req, res) => {
       return res.status(400).json({ error: 'Query parameter "url" is required' });
     }
 
-    const metadata = await scrapeTVDBMetadata(url);
+    if (!url.startsWith('https://www.thetvdb.com')) {
+      return res.status(400).json({ error: 'Invalid TVDB URL' });
+    }
+
+    console.log(`[Scrape] URL: ${url}`);
+    const metadata = await Promise.race([
+      scrapeTVDBMetadata(url)
+    ]);
+
     if (!metadata) {
       return res.status(500).json({ error: 'Failed to scrape metadata' });
     }
@@ -580,9 +612,10 @@ app.get('/api/metadata/thetvdb/data', async (req, res) => {
     res.json(metadata);
   } catch (err) {
     console.error('Scrape endpoint error:', err.message);
-    res.status(err.cause?.statusCode || 500).json({ error: err.message });
+    res.status(err.cause?.statusCode || 500).json({ error: err.message || 'Internal server error' });
   }
 });
+
 
 // ================================
 //        Start API Server
