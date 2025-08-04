@@ -172,7 +172,7 @@ async function scrapeTVDBMetadata(url) {
             return {
                 title: cleanText(document.querySelector('h1')?.textContent),
                 description: cleanText(document.querySelector('div.change_translation_text[data-language="eng"]')?.textContent),
-                poster: posterImg,
+                poster: posterImg, 
                 extraData
             };
         });
@@ -181,8 +181,6 @@ async function scrapeTVDBMetadata(url) {
 
     } catch (err) {
         console.error('Metadata scrape error:', err.message);
-        await fs.writeFile('debug.html', await page.content());
-        await page.screenshot({ path: 'debug.png' });
         return null;
     } finally {
         await browser.close();
