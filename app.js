@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const axiosRetry = require('axios-retry');
 
 // Torrent Servers
 const { scrapeAnimeTosho } = require('./scrapers/torrents/animetosho');
@@ -17,9 +16,15 @@ const { searchMangaPill, getMangaPillChapters, getMangaPillPages } = require('./
 // Streaming Servers
 const { scrapeZoroEpList, scrapeZoroEpStream, scrapeZoroSearch } = require('./scrapers/streaming/zorotv');
 const { scrapeAnimeggSearch, scrapeAnimeggEpList, scrapeAnimeggEpStream } = require('./scrapers/streaming/animegg');
-
 const { scrapeAnimepaheSearch, scrapeAnimepaheEpList, scrapeAnimepaheEpStream } = require('./scrapers/streaming/animepahe');
 const { scrape123AnimesSearch, scrape123AnimesEpList, scrape123AnimesEpStream } = require('./scrapers/streaming/123animes');
+
+// Light Novel Servers
+const { scrapeNovelbinSearch, scrapeNovelbinChapters, scrapeNovelbinChapterContent } = require('./scrapers/novels/novelbin');
+
+// Metadata
+const { searchTheTVDB, scrapeTVDBMetadata } = require('./scrapers/metadata/thetvdb');
+
 
 const app = express();
 app.use(express.json());
@@ -27,6 +32,52 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/api', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// ================================
+//         Novel Scrapers
+// ================================
+
+//
+// ========== NovelBin ==========
+//
+app.get('/api/novels/novelbin/search', async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(400).json({ error: 'Query parameter "q" is required' });
+    }
+    const results = await scrapeNovelbinSearch(q);
+    res.json(results);
+  } catch (err) {
+    res.status(err.cause?.statusCode || 500).json({ error: err.message });
+  }
+});
+
+app.get('/api/novels/novelbin/chapters', async (req, res) => {
+  try {
+    const { url } = req.query;
+    if (!url) {
+      return res.status(400).json({ error: 'Query parameter "url" is required' });
+    }
+    const chapters = await scrapeNovelbinChapters(url);
+    res.json(chapters);
+  } catch (err) {
+    res.status(err.cause?.statusCode || 500).json({ error: err.message });
+  }
+});
+
+app.get('/api/novels/novelbin/read', async (req, res) => {
+  try {
+    const { url } = req.query;
+    if (!url) {
+      return res.status(400).json({ error: 'Query parameter "url" is required' });
+    }
+    const chapterContent = await scrapeNovelbinChapterContent(url);
+    res.json(chapterContent);
+  } catch (err) {
+    res.status(err.cause?.statusCode || 500).json({ error: err.message });
+  }
 });
 
 // ================================
@@ -494,6 +545,44 @@ app.get('/api/torrent/seadex', async (req, res) => {
   }
 });
 
+// ================================
+//        Metadata Scrapers
+// ================================
+
+//
+// ========== TheTVDB ==========
+//
+app.get('/api/metadata/thetvdb/search', async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(400).json({ error: 'Query parameter "q" is required' });
+    }
+    const results = await searchTheTVDB(q);
+    res.json(results);
+  } catch (err) {
+    res.status(err.cause?.statusCode || 500).json({ error: err.message });
+  }
+});
+
+app.get('/api/metadata/thetvdb/data', async (req, res) => {
+  try {
+    const { url } = req.query;
+    if (!url) {
+      return res.status(400).json({ error: 'Query parameter "url" is required' });
+    }
+
+    const metadata = await scrapeTVDBMetadata(url);
+    if (!metadata) {
+      return res.status(500).json({ error: 'Failed to scrape metadata' });
+    }
+
+    res.json(metadata);
+  } catch (err) {
+    console.error('Scrape endpoint error:', err.message);
+    res.status(err.cause?.statusCode || 500).json({ error: err.message });
+  }
+});
 
 // ================================
 //        Start API Server
