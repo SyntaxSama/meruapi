@@ -1,0 +1,35 @@
+MERUAPI RESEARCH-ONLY LICENSE (Draft)
+====================================
+
+Copyright (c) [2025] [SyntaxSama]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to use
+the Software solely for non-commercial, educational, and personal research
+purposes. Commercial use, distribution for a fee, sublicensing, or use in a
+for-profit product or service is strictly prohibited without prior written
+permission from the copyright holder.
+
+By using the Software you agree to comply with all applicable laws and the
+terms of service and usage policies of any third-party websites or services
+accessed by the Software. You acknowledge that the Software operates solely
+as a wrapper/aggregator of publicly available metadata and does not host,
+mirror, or store third-party content on its own servers.
+
+You will not use the Software to promote, facilitate, or materially assist in
+copyright infringement, illegal activities, or any activity that violates the
+rights of third parties.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL
+THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY CLAIM, DAMAGES, OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE,
+ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+This license terminates automatically if you breach any of its terms.
+For permissions beyond those expressly granted herein (including commercial
+use), contact: discord @syntaxsama .
+
+-- End of License --
