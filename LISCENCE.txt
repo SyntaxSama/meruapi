@@ -1,4 +1,4 @@
-MERUAPI RESEARCH-ONLY LICENSE (Draft)
+MERUAPI RESEARCH-ONLY LICENSE
 ====================================
 
 Copyright (c) [2025] [SyntaxSama]
